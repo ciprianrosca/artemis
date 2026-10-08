@@ -4,7 +4,8 @@ Artemis finds roles worth your time, tells you honestly how well you fit each on
 application: a tailored, ATS-safe resume, a cover letter, outreach to the right person, and
 interview prep. She tracks every application and learns what works for you.
 
-It runs on **Claude Code**, **Codex CLI** and the **Claude app** (claude.ai / desktop / mobile).
+It runs in **ChatGPT**, **Gemini** and the **Claude app** with no install, and in **Claude Code**,
+**Codex CLI** and **Gemini CLI** with the full toolset.
 
 An illustrative run with the demo persona:
 
@@ -29,51 +30,65 @@ Skip the other 23. Apply to Mollie and Elastic now.
 - **Draft only.** It never applies, sends a message or logs in for you. You review everything
   and press send yourself.
 - **Your data stays yours.** Your profile, pay and applications live in gitignored folders on your
-  machine (or in your private Claude Project).
+  machine, or in your own chats and Projects.
 
 ## Pick your setup
 
-| | Claude Code / Codex CLI | Claude app |
+**Start with your CV in any form:** a PDF (LinkedIn's *More → Save to PDF* works), a Word document,
+your LinkedIn profile link, or your whole LinkedIn profile copied and pasted. Then say `artemis setup`.
+
+| | ChatGPT / Gemini / Claude app | Claude Code / Codex / Gemini CLI |
 |---|---|---|
 | Fit checks, tailored resume + cover letter, outreach, interview prep, offer maths | ✅ | ✅ |
-| Job search | careers-board feeds + boards + LinkedIn (most complete) | web search |
-| Discover companies (~1,000 tech careers boards) | ✅ | — |
-| Pipeline and learning | automatic (local files) | you re-upload updated files |
-| Needs | a terminal, Python 3.10+ | a Claude plan with Projects and Skills |
+| Job search | web search | careers-board feeds + job boards + LinkedIn (most complete) |
+| Discover companies (~1,000 tech careers boards) | — | ✅ |
+| Pipeline and learning | you keep the files Artemis gives you | automatic (local files) |
+| Needs | a browser | a terminal and Python 3.10+ |
 
-### Claude Code
+### No install: ChatGPT, Gemini or the Claude app
+
+**Download the pack for your app** from the latest release:
+
+- ChatGPT (custom GPT): https://github.com/ciprianrosca/artemis/releases/latest/download/artemis-chatgpt.zip
+- Gemini (Gem): https://github.com/ciprianrosca/artemis/releases/latest/download/artemis-gemini.zip
+- Claude app (Project + Skills): https://github.com/ciprianrosca/artemis/releases/latest/download/artemis-claude.zip
+
+Each zip has a `HOW_TO.md` with the steps (about 5 minutes):
+
+- **ChatGPT:** create a custom GPT, paste `INSTRUCTIONS.md`, upload the three knowledge files, and
+  turn on web search and code. See [chat/platforms/chatgpt.md](chat/platforms/chatgpt.md).
+- **Gemini:** create a Gem, paste `INSTRUCTIONS.md`, and add the three knowledge files. See
+  [chat/platforms/gemini.md](chat/platforms/gemini.md).
+- **Claude app:** upload the six skill zips, create a Project, and paste `PROJECT_INSTRUCTIONS.md`.
+  See [chat/platforms/claude.md](chat/platforms/claude.md).
+
+Then say **`artemis setup`** and attach or paste your CV. Say **"try the demo"** first if you'd
+like to see it work on Sam Rivera, a fictional engineer.
+
+A shared GPT or Gem doesn't keep your files between chats: keep the four files Artemis gives you
+(`master_cv.md`, `knowledge.json`, `contact.json`, `pipeline.md`) and attach them to each new chat,
+or add them to a Project once.
+
+### Full version: Claude Code, Codex CLI or Gemini CLI
 
 ```bash
-git clone https://github.com/<you>/artemis.git
+git clone https://github.com/ciprianrosca/artemis.git
 cd artemis
-pip install -r requirements.txt      # only for rendering DOCX/PDF
-claude
+pip install -r requirements.txt      # renders DOCX/PDF and reads CV files
+claude                               # or: codex, or: gemini
 > artemis demo                       # try it as Sam, a fictional engineer
 > artemis setup                      # then make it yours (about 10 minutes, starts from your CV)
 ```
 
-### Codex CLI
-
-Same steps, but run `codex` instead of `claude`. Codex reads `AGENTS.md`, which maps the same
-commands to the same playbooks.
-
-### Claude app (no terminal)
-
-1. Download this repo (Code → Download ZIP), or ask someone to run `python tools/build_chat_pack.py`
-   and send you `dist/chat/`.
-2. **Upload the skills:** Settings → Capabilities → Skills → upload each zip from
-   `dist/chat/skills/` (or zip each folder in `skills/` yourself, keeping the folder inside the zip).
-3. **Create a Project** called "Artemis". Paste `chat/PROJECT_INSTRUCTIONS.md` into its instructions.
-4. In the Project, say **`artemis setup`** and attach your CV. Artemis interviews you and gives you
-   `master_cv.md`, `knowledge.json`, `contact.json` and `pipeline.md`. Upload them to the Project's
-   knowledge. To try it first, upload the files from `examples/demo/` instead.
+Claude Code reads `CLAUDE.md`, Codex reads `AGENTS.md` and Gemini CLI reads `GEMINI.md`. All three
+map the same commands to the same playbooks in `skills/`.
 
 ## Commands
 
 ```
 # Start
-artemis demo                       # load the fictional demo profile (CLI)
-artemis setup                      # onboarding: CV + LinkedIn → fact bank + search settings
+artemis demo                       # try it with Sam Rivera, a fictional engineer
+artemis setup                      # onboarding: CV (PDF, Word, LinkedIn link or paste) → fact bank + settings
 artemis profile                    # fill gaps in your fact bank
 
 # Find
@@ -106,16 +121,17 @@ Plain language works too: "find me staff roles in Berlin", "is this a fit?", "pr
 ## How it's built
 
 ```
-CLAUDE.md, AGENTS.md     entry points for Claude Code and Codex
+CLAUDE.md, AGENTS.md,    entry points for Claude Code, Codex and Gemini CLI
+GEMINI.md
 identity.md              who Artemis is, and the guardrails
 skills/                  the playbooks: one SKILL.md per area, shared by all three surfaces
 tools/                   standard-library Python: careers boards, job boards, LinkedIn public pages,
-                         company discovery, DOCX/PDF renderer, chat-pack builder
+                         company discovery, CV reader, DOCX/PDF renderer, chat-pack builder
 templates/               blank fact bank, settings, contact line, pipeline
 examples/demo/           Sam Rivera, a fictional backend engineer, for trying things out
 data/catalog.json        ~1,000 tech companies' careers-board slugs (unverified, PRs welcome)
 data/countries/          offer maths and employment-law notes per country
-chat/                    Project instructions for the Claude app
+chat/                    shared chat instructions + per-app setup (ChatGPT, Gemini, Claude)
 profile/ applications/ memory/   YOUR data, gitignored
 ```
 
@@ -138,6 +154,8 @@ Pull requests are welcome, especially:
 - new country packs in `data/countries/` (see the README there)
 - more careers-board slugs in `data/catalog.json`
 - new job sources in `tools/`, which must use public APIs or feeds and the standard library only
+- improvements to the playbooks in `skills/`. Run `python tools/build_chat_pack.py` to rebuild the
+  ChatGPT, Gemini and Claude packs from them
 - fixes when a job board changes its format
 
 ## License
