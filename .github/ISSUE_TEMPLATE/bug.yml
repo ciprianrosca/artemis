@@ -1,0 +1,18 @@
+name: Something broke
+description: A tool error, a job board that changed, or Artemis doing something wrong
+labels: [bug]
+body:
+  - type: dropdown
+    id: app
+    attributes:
+      label: Where are you running Artemis?
+      options: [Claude Code, Codex CLI, Gemini CLI, ChatGPT (custom GPT), Gemini (Gem), Claude app]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+      description: Paste the command and any error. Remove personal details (your CV, pay, contacts) first.
+    validations:
+      required: true

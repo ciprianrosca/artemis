@@ -1,0 +1,11 @@
+name: Idea or improvement
+description: A new feature, job source, country pack or a better playbook
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would make Artemis better?
+      description: The problem first, then your idea for solving it.
+    validations:
+      required: true

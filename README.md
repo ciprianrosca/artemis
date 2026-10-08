@@ -150,7 +150,8 @@ Every personal setting (target titles, where you can work, remote rules) lives i
 
 ## Contributing
 
-Pull requests are welcome, especially:
+Anyone can propose a change; every pull request is reviewed and approved by the maintainer.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Most useful:
 - new country packs in `data/countries/` (see the README there)
 - more careers-board slugs in `data/catalog.json`
 - new job sources in `tools/`, which must use public APIs or feeds and the standard library only
