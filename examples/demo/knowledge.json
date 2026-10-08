@@ -1,0 +1,86 @@
+{
+  "_help": "Demo persona: Sam Rivera is fictional. Copy examples/demo/* into profile/ to try Artemis, then run `artemis setup` to replace it with your own.",
+  "candidate": {
+    "name": "Sam Rivera",
+    "headline": "Senior Backend Engineer, 8 years, payments and logistics platforms",
+    "base_location": "Lisbon, Portugal",
+    "work_authorisation": "EU citizen; would need sponsorship for the US or UK",
+    "languages": ["English (fluent)", "Portuguese (native)", "Spanish (conversational)"],
+    "linkedin_slug": "",
+    "employment_status": "employed; the search is confidential",
+    "country_pack": "PT"
+  },
+  "search_criteria": {
+    "target_titles": ["Senior Backend Engineer", "Staff Engineer", "Senior Software Engineer", "Backend Tech Lead"],
+    "target_levels": "Senior or Staff individual contributor. Tech Lead is fine if it stays hands-on. No people-management roles.",
+    "work_modes": ["remote within Europe", "hybrid or on-site in Lisbon"],
+    "relocation": "no",
+    "industries_preferred": ["fintech", "developer tools", "climate"],
+    "industries_avoid": ["gambling", "ad tech"],
+    "company_stage": "scale-up (Series B or later) or profitable",
+    "upside_signals": ["strong engineering culture (public RFCs, blog)", "equity", "Go or Kotlin backend", "on-call that's sane"],
+    "comp": {
+      "currency": "EUR",
+      "numbers": "Kept out of git in profile/comp.local.json."
+    }
+  },
+  "filters": {
+    "title_regex": "\\b(senior|sr\\.?|staff|lead|principal)\\b.*\\b(backend|back-end|software|platform|go|golang|kotlin)\\b.*\\b(engineer|developer)\\b|\\bstaff (software )?engineer\\b|\\btech(nical)? lead\\b",
+    "scope_regex": "",
+    "exclude_title_regex": "\\bintern\\b|junior|graduate|recruit|sales|manager|director|head of|frontend|front-end|ios|android|data scientist|machine learning",
+    "workday_search": "backend engineer",
+    "location": {
+      "onsite_ok_regex": "lisbon|lisboa|portugal",
+      "remote": true,
+      "remote_open_regex": "europe|\\beu\\b|emea|european|portugal|worldwide|anywhere|global|\\bcet\\b|\\bwet\\b",
+      "remote_region_regex": "spain|germany|netherlands|ireland|france|poland|united kingdom|\\buk\\b|london|berlin|amsterdam|dublin|madrid|barcelona"
+    }
+  },
+  "search": {
+    "linkedin_locations": ["Portugal", "European Union"],
+    "board_queries": ["senior backend engineer", "staff engineer", "senior software engineer"],
+    "web_queries": [
+      "site:welcometothejungle.com \"senior backend engineer\" remote Europe",
+      "site:landing.jobs \"backend\" senior Lisbon"
+    ]
+  },
+  "rubric": {
+    "level_scope": 25,
+    "must_haves": 25,
+    "location_mode": 15,
+    "domain": 10,
+    "comp": 10,
+    "company_health": 5,
+    "upside": 10
+  },
+  "constraints": {
+    "timeline": "60-day notice period in the current contract",
+    "non_compete": "none",
+    "non_solicit": "none",
+    "confidentiality": "Resumes describe scope, outcomes and methods; no non-public customer names, incident details or financials.",
+    "exit_narrative": "I've built the payments platform from 2 to 40 services and want a bigger distributed-systems problem.",
+    "connectors": "Never use the work Google account. Check which account a connector is on before reading anything."
+  },
+  "watchlist": [
+    {"company": "GitLab", "ats": "greenhouse", "slug": "gitlab", "why": "all-remote, strong public handbook"},
+    {"company": "Elastic", "ats": "greenhouse", "slug": "elastic", "why": "distributed systems, remote Europe"},
+    {"company": "Wise", "ats": "greenhouse", "slug": "wise", "why": "payments, big engineering hub in Europe"},
+    {"company": "Mollie", "ats": "ashby", "slug": "mollie", "why": "payments, Amsterdam/Lisbon"},
+    {"company": "Plaid", "ats": "ashby", "slug": "plaid", "why": "fintech infrastructure"}
+  ],
+  "watchlist_manual": [],
+  "vc_boards": [
+    {"name": "Point Nine", "host": "jobs.pointnine.com", "getro_id": 1680},
+    {"name": "Earlybird", "host": "jobs.earlybird.com", "getro_id": 617},
+    {"name": "Accel", "host": "jobs.accel.com", "getro_id": 8672},
+    {"name": "Dawn Capital", "host": "jobs.dawncapital.com", "getro_id": 3063}
+  ],
+  "pipeline_stages": ["found", "shortlisted", "applied", "screen", "interview", "final", "offer", "accepted", "rejected", "withdrawn", "ghosted"],
+  "patterns": {
+    "queries_that_work": [],
+    "queries_that_dont": [],
+    "resume_framings_that_got_replies": [],
+    "interview_questions_seen": [],
+    "dead_end_companies": []
+  }
+}

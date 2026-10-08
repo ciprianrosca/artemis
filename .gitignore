@@ -1,0 +1,16 @@
+# Your data. Never committed: it holds your CV, pay, contacts and applications.
+# If your fork is PRIVATE and you want to version your data, remove these lines knowingly.
+profile/*
+!profile/README.md
+applications/*
+!applications/README.md
+memory/*
+!memory/README.md
+
+# Build output and local clutter
+dist/
+__pycache__/
+*.pyc
+.venv/
+~$*
+.DS_Store

@@ -1,0 +1,79 @@
+{
+  "_help": "Your search settings. `artemis setup` fills this in by interviewing you; edit by hand any time. Lives in profile/knowledge.json (gitignored). Keys starting with _ are notes.",
+  "candidate": {
+    "name": "[ASK]",
+    "headline": "[ASK] e.g. Senior Backend Engineer, 8 years, payments and data platforms",
+    "base_location": "[ASK] city, country",
+    "work_authorisation": "[ASK] e.g. EU citizen; needs visa sponsorship for the US",
+    "languages": ["English"],
+    "linkedin_slug": "[ASK] the part after linkedin.com/in/",
+    "employment_status": "[ASK] employed (search is confidential) | between roles | notice period until <date>",
+    "country_pack": "[ASK] ISO code of the country you're employed or taxed in, for offer maths (data/countries/<CODE>.md)"
+  },
+  "search_criteria": {
+    "target_titles": ["[ASK] 3–8 market titles, e.g. Senior Backend Engineer", "Staff Engineer"],
+    "target_levels": "[ASK] the level(s) you want, and whether one step down is acceptable",
+    "work_modes": ["[ASK] e.g. remote within Europe", "hybrid in Lisbon"],
+    "relocation": "[ASK] no | yes, to <places>",
+    "industries_preferred": [],
+    "industries_avoid": [],
+    "company_stage": "[ASK] any | early-stage | scale-up | enterprise",
+    "upside_signals": ["[ASK] what makes a role exciting for you, e.g. strong engineering culture, equity, AI-native product"],
+    "comp": {
+      "currency": "[ASK] EUR",
+      "numbers": "Kept out of git in profile/comp.local.json: current base, bonus, floor, target."
+    }
+  },
+  "filters": {
+    "_help": "Regexes the scanners use (case-insensitive). Setup writes them from your target titles and location rules; you don't need to touch them.",
+    "title_regex": "",
+    "scope_regex": "",
+    "exclude_title_regex": "\\bintern\\b|junior|graduate|recruit|sales",
+    "workday_search": "",
+    "location": {
+      "onsite_ok_regex": "",
+      "remote": true,
+      "remote_open_regex": "worldwide|anywhere|global",
+      "remote_region_regex": ""
+    }
+  },
+  "search": {
+    "linkedin_locations": ["[ASK] e.g. Portugal", "European Union"],
+    "board_queries": [],
+    "web_queries": ["[optional] site:welcometothejungle.com \"<title>\" remote Europe"]
+  },
+  "rubric": {
+    "_help": "Weights for the 100-point fit score. Change them if something matters more to you.",
+    "level_scope": 25,
+    "must_haves": 25,
+    "location_mode": 15,
+    "domain": 10,
+    "comp": 10,
+    "company_health": 5,
+    "upside": 10
+  },
+  "constraints": {
+    "timeline": "[ASK] when can you start; notice period",
+    "non_compete": "[ASK] none | details from your contract",
+    "non_solicit": "[ASK] none | e.g. no recruiting former colleagues for 12 months",
+    "confidentiality": "Resumes describe scope, outcomes and methods; no non-public customer names, incident details or financials.",
+    "exit_narrative": "[ASK] one neutral, forward-looking line for 'why are you leaving?'",
+    "connectors": "Never use an employer's email or calendar. Check which account a connector is on before reading anything."
+  },
+  "watchlist": [],
+  "watchlist_manual": [],
+  "vc_boards": [
+    {"name": "Point Nine", "host": "jobs.pointnine.com", "getro_id": 1680},
+    {"name": "Earlybird", "host": "jobs.earlybird.com", "getro_id": 617},
+    {"name": "Accel", "host": "jobs.accel.com", "getro_id": 8672},
+    {"name": "Dawn Capital", "host": "jobs.dawncapital.com", "getro_id": 3063}
+  ],
+  "pipeline_stages": ["found", "shortlisted", "applied", "screen", "interview", "final", "offer", "accepted", "rejected", "withdrawn", "ghosted"],
+  "patterns": {
+    "queries_that_work": [],
+    "queries_that_dont": [],
+    "resume_framings_that_got_replies": [],
+    "interview_questions_seen": [],
+    "dead_end_companies": []
+  }
+}
