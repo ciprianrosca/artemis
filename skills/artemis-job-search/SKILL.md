@@ -18,7 +18,8 @@ CLI paths: `profile/` and `applications/`. Chat: the Project's knowledge files.
    **CLI (Claude Code, Codex):** independent commands, in parallel where the agent allows it:
    - Careers boards on the watchlist: `python tools/ats_jobs.py scan`
    - Other boards: `python tools/boards_jobs.py all` (HN "Who is hiring?", Himalayas, VC
-     portfolio boards, We Work Remotely)
+     portfolio boards, We Work Remotely, Remote OK, Working Nomads, remocate.app). Remote OK's API
+     terms: when you show its roles, name Remote OK as the source and keep its link.
    - LinkedIn, once per title variant:
      `python tools/linkedin_jobs.py search "<title>" --location "<place>" --days 7`.
      Run one pass per entry in `search.linkedin_locations`; add `--remote` for the region pass.
@@ -81,7 +82,7 @@ under a non-solicit: applying may be fine, but they should know).
 `python tools/ats_jobs.py scan [--company X]`. Report only what's **new** compared with the
 pipeline, scored with the rubric.
 
-## `artemis boards [hn|himalayas|getro|wwr]` (CLI)
+## `artemis boards [hn|himalayas|getro|wwr|remoteok|workingnomads|remocate]` (CLI)
 `python tools/boards_jobs.py <source>`, scored with the rubric. HN posts monthly (the 1st
 working day), so check it early in the month.
 
