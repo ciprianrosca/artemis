@@ -105,12 +105,10 @@ def to_docx(blocks, out):
         bdr.append(bottom)
         pPr.append(bdr)
 
-    seen_h2 = False
-    for kind, text in blocks:
+    for kind, text, header in with_header(blocks):
         if kind == "h1":
             para(text, 20, True, WD_ALIGN_PARAGRAPH.CENTER, after=0)
         elif kind == "h2":
-            seen_h2 = True
             rule(para(text.upper(), 11, True, before=8, after=3, color=(0x22, 0x3A, 0x5E)))
         elif kind == "h3":
             para(text, 10.5, True, before=5, after=1)
@@ -118,14 +116,25 @@ def to_docx(blocks, out):
             p = para(text, style="List Bullet", after=1)
             p.paragraph_format.left_indent = Cm(0.6)
         elif kind == "p":
-            header = not seen_h2
             para(text, 10 if header else 10.5, align=WD_ALIGN_PARAGRAPH.CENTER if header else None)
     doc.save(out)
 
 
-def to_html(blocks):
-    out, in_list, seen_h2 = [], False, False
+def with_header(blocks):
+    """Yield (kind, text, header): header is True for the lines right under `# Name` (title,
+    contact) up to the first blank line or heading. Letters have no `##`, so that is the only rule."""
+    header = False
     for kind, text in blocks:
+        if kind == "h1":
+            header = True
+        elif kind != "p":
+            header = False
+        yield kind, text, header and kind == "p"
+
+
+def to_html(blocks):
+    out, in_list = [], False
+    for kind, text, header in with_header(blocks):
         t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", html.escape(text))
         if kind != "li" and in_list:
             out.append("</ul>")
@@ -133,7 +142,6 @@ def to_html(blocks):
         if kind == "h1":
             out.append(f"<h1>{t}</h1>")
         elif kind == "h2":
-            seen_h2 = True
             out.append(f"<h2>{t}</h2>")
         elif kind == "h3":
             out.append(f"<h3>{t}</h3>")
@@ -143,7 +151,7 @@ def to_html(blocks):
                 in_list = True
             out.append(f"<li>{t}</li>")
         elif kind == "p":
-            out.append(f'<p class="{"head" if not seen_h2 else ""}">{t}</p>')
+            out.append(f'<p class="{"head" if header else ""}">{t}</p>')
     if in_list:
         out.append("</ul>")
     css = """@page{size:A4;margin:16mm 19mm}body{font-family:Calibri,Carlito,Arial,sans-serif;font-size:10.5pt;
