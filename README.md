@@ -26,7 +26,7 @@ Skip the other 23. Apply to Mollie and Elastic now.
   pay, company health, upside) and a verdict: apply, stretch or skip.
 - **Direct sources.** It reads companies' own careers boards (Greenhouse, Lever, Ashby,
   SmartRecruiters, Workable, Workday), HN "Who is hiring?", Himalayas, VC portfolio boards, We Work
-  Remotely and LinkedIn's public job search. It's not limited to aggregators.
+  Remotely, Remote OK, Working Nomads, remocate.app and LinkedIn's public job search. It's not limited to aggregators.
 - **Draft only.** It never applies, sends a message or logs in for you. You review everything
   and press send yourself.
 - **Your data stays yours.** Your profile, pay and applications live in gitignored folders on your

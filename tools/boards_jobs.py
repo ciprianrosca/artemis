@@ -5,12 +5,18 @@
   python tools/boards_jobs.py himalayas     # Himalayas remote board (location restrictions + salary)
   python tools/boards_jobs.py getro         # VC portfolio boards from knowledge.json → vc_boards
   python tools/boards_jobs.py wwr           # We Work Remotely RSS feeds
+  python tools/boards_jobs.py remoteok      # Remote OK public API (latest ~100 roles)
+  python tools/boards_jobs.py workingnomads # Working Nomads public API
+  python tools/boards_jobs.py remocate      # remocate.app RSS: remote and relocation roles
   python tools/boards_jobs.py all
 
 Every source goes through the same title and location rules as tools/ats_jobs.py, taken from
 profile/knowledge.json → filters. Search phrases for Himalayas and Getro come from
 knowledge.json → search.board_queries (default: your first four target titles). Remote roles tied to
 places outside your remote rule are dropped unless --include-restricted. Output is JSON on stdout.
+
+Remote OK's API terms ask anyone using it to link back to the job on Remote OK and name Remote OK
+as the source: keep the remoteok.com `url` and `source` when you show these roles.
 """
 import argparse
 import html
@@ -178,7 +184,69 @@ def wwr():
     return out, "We Work Remotely feeds"
 
 
-SOURCES = {"hn": hn, "himalayas": himalayas, "getro": getro, "wwr": wwr}
+# --- Remote OK --------------------------------------------------------------------------------
+
+def remoteok():
+    # The first element is a legal notice, not a job.
+    out = []
+    for j in json.loads(http("https://remoteok.com/api"))[1:]:
+        if not is_target(j.get("position")):
+            continue
+        where = j.get("location") or "Anywhere"
+        keep, restricted = location_ok(where, True)
+        if not keep:
+            continue
+        sal = f'{j["salary_min"]}-{j.get("salary_max") or ""} USD' if j.get("salary_min") else None
+        out.append({"source": "remoteok", "company": j.get("company"), "title": j.get("position"),
+                    "location": where, "remote_restricted": restricted, "salary": sal, "url": j.get("url"),
+                    "posted": (j.get("date") or "")[:10], "tags": j.get("tags"),
+                    "description": text(j.get("description"))[:400]})
+    return out, "Remote OK API (source: Remote OK, https://remoteok.com)"
+
+
+# --- Working Nomads ---------------------------------------------------------------------------
+
+def workingnomads():
+    out = []
+    for j in json.loads(http("https://www.workingnomads.com/api/exposed_jobs/")):
+        if not is_target(j.get("title")):
+            continue
+        where = j.get("location") or "Anywhere"
+        keep, restricted = location_ok(where, True)
+        if not keep:
+            continue
+        out.append({"source": "workingnomads", "company": j.get("company_name"), "title": j.get("title"),
+                    "location": where, "remote_restricted": restricted, "url": j.get("url"),
+                    "posted": (j.get("pub_date") or "")[:10], "tags": j.get("tags"),
+                    "description": text(j.get("description"))[:400]})
+    return out, "Working Nomads API"
+
+
+# --- remocate.app -----------------------------------------------------------------------------
+
+def remocate():
+    # Items read "<Role> at <Company>", with "<Country> · Remote" or "<Country> · Relocation".
+    out = []
+    root = ET.fromstring(http("https://www.remocate.app/feed.xml", headers={"Accept": "application/rss+xml"}))
+    for it in root.iter("item"):
+        title, _, company = (it.findtext("title") or "").rpartition(" at ")
+        if not is_target(title):
+            continue
+        place, _, mode = (it.findtext("description") or "").partition(" · ")
+        remote = mode.strip().lower() == "remote"
+        where = "Worldwide" if place.strip().lower() == "world" else place.strip()
+        keep, restricted = location_ok(where, remote)
+        if not keep:
+            continue
+        out.append({"source": "remocate", "company": company, "title": title,
+                    "location": f"{where} ({mode.strip() or 'unspecified'})", "work_mode": mode.strip().lower(),
+                    "remote_restricted": restricted, "url": it.findtext("link"),
+                    "posted": (it.findtext("pubDate") or "")[:16]})
+    return out, "remocate.app RSS"
+
+
+SOURCES = {"hn": hn, "himalayas": himalayas, "getro": getro, "wwr": wwr,
+           "remoteok": remoteok, "workingnomads": workingnomads, "remocate": remocate}
 
 
 def dedupe(jobs):
