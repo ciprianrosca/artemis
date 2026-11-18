@@ -14,3 +14,6 @@ __pycache__/
 .venv/
 ~$*
 .DS_Store
+
+# A data repository cloned inside this folder (ARTEMIS_DATA_DIR=./artemis-data)
+/artemis-data/
