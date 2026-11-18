@@ -18,6 +18,7 @@ Output is JSON on stdout: one object per matching role.
 """
 import argparse
 import html
+import http.client
 import json
 import re
 import sys
@@ -108,7 +109,7 @@ def workday(slug, search="", cap=200, title_ok=None, **_):
                 try:
                     info = get(f"{base}/wday/cxs/{tenant}/{site}{j.get('externalPath', '')}")["jobPostingInfo"]
                     loc = "; ".join([info.get("location") or ""] + (info.get("additionalLocations") or []))
-                except (urllib.error.URLError, KeyError, ValueError):
+                except (OSError, http.client.HTTPException, KeyError, ValueError):
                     pass
             yield {"title": j["title"], "location": loc,
                    "url": f"{base}/{site}{j.get('externalPath', '')}", "updated": j.get("postedOn"),
@@ -152,7 +153,8 @@ def scan(entries, filters, loc_re=None, exclude_loc=None, full=False, workday_se
         try:
             jobs = ATS[e["ats"]](e["slug"], search=workday_search, title_ok=filters.title_ok)
             out += match(e["company"], jobs, filters, loc_re, exclude_loc, full)
-        except (urllib.error.URLError, KeyError, ValueError) as ex:
+        # OSError covers URLError, timeouts and dropped connections (RemoteDisconnected).
+        except (OSError, http.client.HTTPException, KeyError, ValueError) as ex:
             errors.append(f'{e["company"]} ({e["ats"]}/{e["slug"]}): {ex}')
     for err in errors:
         print("WARN:", err, file=sys.stderr)
