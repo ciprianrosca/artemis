@@ -83,6 +83,29 @@ claude                               # or: codex, or: gemini
 Claude Code reads `CLAUDE.md`, Codex reads `AGENTS.md` and Gemini CLI reads `GEMINI.md`. All three
 map the same commands to the same playbooks in `skills/`.
 
+### Keep your data separate, and run in the cloud
+
+Everything personal (profile, applications, memory, tailored CVs) can live in its own folder, apart
+from this engine. That keeps the engine clean for updates and lets a cloud session or a second
+computer pick up where the last one stopped.
+
+1. Create a **private** git repository for your data, for example `artemis-data`.
+2. Point Artemis at it:
+   ```
+   export ARTEMIS_DATA_DIR=~/artemis-data
+   export ARTEMIS_DATA_REPO=https://github.com/you/artemis-data.git
+   python tools/artemis_data.py pull      # clones it the first time, updates it afterwards
+   ```
+3. Artemis pulls at the start of each session and pushes at the end (`python tools/artemis_data.py push`).
+   Nothing is uploaded unless that command runs, and it only touches your data folder.
+
+For **Claude Code on the web**, create an environment for this repository, add the two variables
+above, and use a setup script that runs `pip install -r requirements.txt` and
+`python tools/artemis_data.py pull`. Give the environment access to your data repository, and allow
+network access to the job boards you scan. Don't put API keys in either repository.
+If you set nothing, Artemis keeps your data in this folder's gitignored `profile/`, `applications/`
+and `memory/`, as before.
+
 ## Commands
 
 ```

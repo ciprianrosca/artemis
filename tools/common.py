@@ -11,7 +11,11 @@ import re
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PROFILE = os.environ.get("ARTEMIS_PROFILE_DIR") or os.path.join(ROOT, "profile")
+# Your personal files (profile/, applications/, memory/, cvs/) live in the data folder. By default
+# that is this repo's own folder; set ARTEMIS_DATA_DIR to keep them elsewhere, for example in a
+# separate private git repository (see tools/artemis_data.py).
+DATA_DIR = os.path.abspath(os.environ.get("ARTEMIS_DATA_DIR") or ROOT)
+PROFILE = os.environ.get("ARTEMIS_PROFILE_DIR") or os.path.join(DATA_DIR, "profile")
 
 REMOTE = r"remote|anywhere|distributed|work from home|wfh|home.based"
 # Words left over after removing these mean the posting names a place ("Remote, US").
@@ -23,6 +27,10 @@ def utf8_console():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+
+def data_path(*parts):
+    return os.path.join(DATA_DIR, *parts)
 
 
 def profile_path(*parts):
