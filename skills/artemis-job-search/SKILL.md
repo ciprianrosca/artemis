@@ -50,10 +50,12 @@ CLI paths: `profile/` and `applications/`. Chat: the Project's knowledge files.
    (`python tools/linkedin_jobs.py detail <id>` or web fetch). A score from the title alone is a
    guess: mark it `~`. Before recommending a role, check that it's still open on the employer's
    own careers page. A cached or aggregator copy is not proof.
-6. **Present** a ranked table (verdict · score · role · company · location/mode · posted · source).
-   Put **no links in the table**. Then add a Links block with each URL **bare, on its own line**: a
-   markdown link breaks when copied from a terminal. Then add one line per top role (*why it fits ·
-   the gap*), and close with the recommendation: "Apply to A and B now, research C, skip the rest."
+6. **Present** a ranked table (verdict · score · role · company · location/mode · posted · link).
+   The link is the **last column of the same table**, as a **bare URL** (never a markdown link: it
+   breaks when copied from a terminal, and a separate Links block is hard to follow). Every table
+   that lists roles carries its links, including skipped and restricted-remote ones. Then add one
+   line per top role (*why it fits · the gap*), and close with the recommendation: "Apply to A and B
+   now, research C, skip the rest."
    Show the top 10–15 roles; the rest become one count line.
 7. **Record.** After the user picks, add the chosen roles to the pipeline as `shortlisted`. Log the
    queries that found good roles in `patterns.queries_that_work`.
