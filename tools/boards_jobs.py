@@ -8,6 +8,7 @@
   python tools/boards_jobs.py remoteok      # Remote OK public API (latest ~100 roles)
   python tools/boards_jobs.py workingnomads # Working Nomads public API
   python tools/boards_jobs.py remocate      # remocate.app RSS: remote and relocation roles
+  python tools/boards_jobs.py jobgether     # Jobgether remote roles open to your country (search.jobgether_country)
   python tools/boards_jobs.py all
 
 Every source goes through the same title and location rules as tools/ats_jobs.py, taken from
@@ -245,8 +246,67 @@ def remocate():
     return out, "remocate.app RSS"
 
 
+# --- Jobgether --------------------------------------------------------------------------------
+
+JOBGETHER_SLUGS = ["engineering-manager", "vp-of-engineering", "chief-technology-officer",
+                   "head-of-technology", "engineering-lead"]
+
+
+def _ld_json(page):
+    out = []
+    for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', page, re.S):
+        try:
+            d = json.loads(b)
+        except ValueError:
+            continue
+        out += d.get("@graph") or [d]
+    return out
+
+
+def jobgether():
+    # Country pages (jobgether.com/remote-jobs/<country>/<role>) list remote roles open to that
+    # country; many role slugs answer 410 Gone for a country, so a missing page is skipped.
+    # Each offer page carries a JobPosting whose description opens "the offer is available from: …".
+    country = (K.get("search") or {}).get("jobgether_country", "romania")
+    listed = {}
+    for slug in JOBGETHER_SLUGS:
+        try:
+            page = http(f"https://jobgether.com/remote-jobs/{country}/{slug}", headers={"Accept": "text/html"})
+        except urllib.error.HTTPError:
+            continue
+        for x in _ld_json(page):
+            if x.get("@type") == "ItemList":
+                for it in x.get("itemListElement", []):
+                    if is_target(it.get("name")):
+                        listed[it["url"]] = it["name"]
+        time.sleep(1)
+    out = []
+    for url, title in listed.items():
+        try:
+            page = http(url, headers={"Accept": "text/html"})
+        except urllib.error.HTTPError:
+            continue  # 410: expired
+        jp = next((x for x in _ld_json(page) if x.get("@type") == "JobPosting"), None)
+        if not jp:
+            continue
+        body = text(jp.get("description"))
+        m = re.search(r"available from:\s*(.+?)(?:\s{2,}|\n|$)", body)
+        where = (m.group(1) if m else country.title())[:300]
+        remote = jp.get("jobLocationType") == "TELECOMMUTE"
+        keep, restricted = location_ok(where, remote)
+        if not keep:
+            continue
+        out.append({"source": "jobgether", "company": (jp.get("hiringOrganization") or {}).get("name"),
+                    "title": jp.get("title") or title, "location": where, "remote_restricted": restricted,
+                    "url": url, "posted": (jp.get("datePosted") or "")[:10],
+                    "valid_through": (jp.get("validThrough") or "")[:10], "description": body[:600]})
+        time.sleep(1)
+    return out, f"Jobgether ({country}): {len(listed)} target titles listed"
+
+
 SOURCES = {"hn": hn, "himalayas": himalayas, "getro": getro, "wwr": wwr,
-           "remoteok": remoteok, "workingnomads": workingnomads, "remocate": remocate}
+           "remoteok": remoteok, "workingnomads": workingnomads, "remocate": remocate,
+           "jobgether": jobgether}
 
 
 def dedupe(jobs):
