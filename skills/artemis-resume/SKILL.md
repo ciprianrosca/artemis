@@ -37,6 +37,9 @@ Summary, the bullet order and the keyword emphasis.
    - the ATS keyword list: titles, domains, methods, tools, in the JD's own spelling
    - each requirement → fact-bank line (quoted) or **gap**
    - the rubric score (`artemis-job-search`) and the angle: the one-sentence story this resume tells
+   - **knock-out check** (see "Getting to a human" below): every hard filter the ad or form can
+     apply, the user's truthful answer, pass/fail. A failed hard filter means no cold application:
+     go through a person or skip, and say which.
 3. **Write `resume.md`**:
    ```markdown
    # <Full Name>
@@ -79,7 +82,14 @@ Summary, the bullet order and the keyword emphasis.
    Chat: create the DOCX (and PDF if available) with the document tools: one column, standard
    headings, no tables, text boxes, icons or photos, and contact details in the body, not a header.
    If file creation isn't available, give clean markdown they can paste into a document.
+   The renderer reads the PDF back like a parser and prints `ATS check: ... reads back cleanly`.
+   If it prints `ATS CHECK:` problems (ligature glyphs like "Staﬀ", missing headings), don't hand
+   the PDF over: hand over the DOCX, or have them export the PDF from Word.
 6. **Check before handing over** (one line per check):
+   - [ ] the renderer's ATS check passed
+   - [ ] one employer per `###` entry (two companies on one line become one garbled employer)
+   - [ ] section headings are the standard ones parsers expect: Summary, Experience, Projects,
+     Skills, Education (put extras like a GitHub link in the line under the heading, not in it)
    - [ ] 1 page for under 10 years of relevant history, otherwise 2 pages at most
    - [ ] every must-have keyword they truly have appears at least once, spelled as in the JD
    - [ ] every number traces to the fact bank
@@ -96,7 +106,60 @@ Run steps 1, 2 and 4 of `tailor`, then render.
 ## `artemis answers <url>`: application-form questions
 Draft answers to the form's questions ("Why us?", "Describe a hard technical problem"...) from
 the fact bank and story bank, within each field's character limit, as text in `answers.md`. The
-user pastes and submits them. Artemis never fills in or submits the form.
+user pastes and submits them. Artemis never fills in or submits the form. Write them by the
+answer rules below.
+
+## Getting to a human
+
+A cold application meets machines first: knock-out questions, location and salary fields, keyword
+search and, more and more, an AI match score (Ashby, Workday, Eightfold, Rippling, LinkedIn's
+"screening questions"). A rejection within 48 hours is almost always one of these, not a person.
+Every rule here stays inside "never invent": we choose what to show first, never what's true.
+
+**1. Knock-out check, before writing anything** (in `fit.md`). List each hard filter and the
+truthful answer:
+- location and work eligibility ("must be based in Spain or Poland"; the country list on a remote role)
+- years of X, in the ad's own words ("7+ years managing managers")
+- named must-have tech or domain ("production C#", "PCI DSS")
+- languages, degree, on-site days, travel, notice period, posted pay range vs `search_criteria`
+A truthful "no" on a hard filter fails the form no matter how good the CV is. Then the honest
+moves are: a warm intro or a message to the hiring manager first (`artemis-linkedin`), or skip.
+Don't spend a cold application on it.
+
+**2. CV for the match score** (on top of the tailoring rules above):
+- The headline under the name uses the ad's title family when it's true ("Engineering Manager —
+  …" for an EM role, not "Director of Engineering"). The job lines keep the real titles.
+- Must-have keywords go in the Summary **and** in the current role's bullets. Recent experience
+  weighs more, and a keyword that appears only in Skills counts least.
+- Spell the term as the ad does, and give both forms once: "Site Reliability Engineering (SRE)".
+- State counts as numbers the parser can read: "15 years", "40+ engineers", "4 Engineering Managers".
+- The contact line says where they can work from: "Bucharest, Romania (EU citizen)".
+
+**3. Answer rules** (forms are read by an AI evaluator or a recruiter skimming 200 of them):
+- **Yes/no and dropdowns: answer exactly and truthfully.** If the truthful answer fails, the
+  knock-out check should have caught it. Never tick "yes" to get through.
+- **Free text: lead with the strongest true fact, in the question's words.** First sentence =
+  the answer. "Yes: I led a 40+ engineer division on a Java core-banking platform…", not
+  "Limited. I haven't…". For a real gap: adjacent experience first, the gap plainly second,
+  the plan third. Never open with the gap.
+- **Short.** 2–4 sentences unless the field asks for more. One number per answer at least.
+- **Mirror the ad's must-have words** where they're true: the evaluator compares answer to ad.
+- **Salary:** a numeric field above the posted maximum is an automatic filter. If the user's
+  floor is inside the posted range, give a number inside it. If the field is free text, give the
+  range they'd accept and "depending on the total package". If their floor is above the range,
+  tell them before they apply. The number is always theirs to choose.
+- **Optional fields that feed the score** (LinkedIn URL, portfolio/GitHub, "anything else"):
+  fill them. Empty fields score lower.
+- **Notice / start date:** state it plainly ("available now").
+
+**4. Channel and timing.**
+- Apply within 72 hours of the posting date. Ranked lists favour early applicants, and recruiters
+  often stop reading at the first good shortlist.
+- Prefer the company's own ATS over LinkedIn Easy Apply or aggregators: Easy Apply carries the
+  strictest auto-reject screening questions and the most volume.
+- Every application to a role scoring 70+ gets a same-day message to the hiring manager or
+  recruiter (`artemis-linkedin`). A person who has seen the name can pull the CV out of the pile.
+- Fewer, better: one well-targeted application with a message beats five sprayed ones.
 
 ## Anti-patterns
 - Keyword stuffing: a skill they can't talk about for 5 minutes doesn't go on the resume.
