@@ -75,8 +75,16 @@ def to_docx(blocks, out):
 
     doc = Document()
     for s in doc.sections:
+        s.page_width, s.page_height = Cm(21.0), Cm(29.7)  # A4, same as the PDF (python-docx defaults to Letter)
         s.top_margin = s.bottom_margin = Cm(1.6)
         s.left_margin = s.right_margin = Cm(1.9)
+    # Parsers and some ATS show the file's author; python-docx leaves "python-docx" there, and a
+    # PDF exported from Word takes the Office account's name. Set both to the candidate.
+    name = next((t for k, t in blocks if k == "h1"), "")
+    cp = doc.core_properties
+    cp.author = cp.last_modified_by = name
+    cp.title = f"{name} - CV" if name else ""
+    cp.comments = ""
     base = doc.styles["Normal"]
     base.font.name, base.font.size = FONT, Pt(10.5)
     base.element.rPr.rFonts.set(qn("w:eastAsia"), FONT)
@@ -109,9 +117,11 @@ def to_docx(blocks, out):
         if kind == "h1":
             para(text, 20, True, WD_ALIGN_PARAGRAPH.CENTER, after=0)
         elif kind == "h2":
-            rule(para(text.upper(), 11, True, before=8, after=3, color=(0x22, 0x3A, 0x5E)))
+            # Real heading styles: parsers that read DOCX structure find sections by style, not
+            # only by guessing from bold text. Run-level formatting overrides the theme look.
+            rule(para(text.upper(), 11, True, before=8, after=3, color=(0x22, 0x3A, 0x5E), style="Heading 1"))
         elif kind == "h3":
-            para(text, 10.5, True, before=5, after=1)
+            para(text, 10.5, True, before=5, after=1, color=(0, 0, 0), style="Heading 2")
         elif kind == "li":
             p = para(text, style="List Bullet", after=1)
             p.paragraph_format.left_indent = Cm(0.6)
@@ -176,7 +186,19 @@ def to_pdf(blocks, out):
     body = to_html(blocks)
     css = re.search(r"<style>(.*?)</style>", body, re.S).group(1)
     css = re.sub(r"@page\{[^}]*\}", "", css).replace("Calibri,Carlito,Arial,", "")
-    story = fitz.Story(html=re.sub(r"<style>.*?</style>", "", body, flags=re.S), user_css=css)
+    # MuPDF's built-in sans (Nimbus) shapes "fi", "ff", "fl" into ligature glyphs, and parsers then
+    # read "AI-ﬁrst", "Staﬀ", "Conﬂuence": keywords that no longer match. Arial / Liberation Sans
+    # have no ligature table, so embed one of those when the system has it.
+    archive, font_css = None, ""
+    font = pdf_font()
+    if font:
+        folder, regular, bold = font
+        archive = fitz.Archive(folder)
+        font_css = (f"@font-face{{font-family:CV;src:url('{regular}')}}"
+                    f"@font-face{{font-family:CV;font-weight:bold;src:url('{bold}')}}"
+                    "body{font-family:CV}")
+    story = fitz.Story(html=re.sub(r"<style>.*?</style>", "", body, flags=re.S), user_css=css + font_css,
+                       archive=archive)
     page = fitz.paper_rect("a4")
     content = page + (54, 45, -54, -45)  # ~19 mm sides, ~16 mm top/bottom
     writer = fitz.DocumentWriter(out)
@@ -187,7 +209,57 @@ def to_pdf(blocks, out):
         story.draw(dev)
         writer.end_page()
     writer.close()
+    name = next((t for k, t in blocks if k == "h1"), "")
+    doc = fitz.open(out)
+    doc.set_metadata({"author": name, "title": f"{name} - CV" if name else "", "creator": "", "producer": ""})
+    doc.saveIncr()
+    doc.close()
     return True
+
+
+FONT_DIRS = [  # (folder, regular, bold): first one present wins
+    (os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts"), "arial.ttf", "arialbd.ttf"),
+    ("/System/Library/Fonts/Supplemental", "Arial.ttf", "Arial Bold.ttf"),
+    ("/Library/Fonts", "Arial.ttf", "Arial Bold.ttf"),
+    ("/usr/share/fonts/truetype/liberation", "LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf"),
+    ("/usr/share/fonts/liberation-sans", "LiberationSans-Regular.ttf", "LiberationSans-Bold.ttf"),
+    ("/usr/share/fonts/truetype/msttcorefonts", "Arial.ttf", "Arial_Bold.ttf"),
+]
+
+
+def pdf_font():
+    for folder, regular, bold in FONT_DIRS:
+        if os.path.isfile(os.path.join(folder, regular)) and os.path.isfile(os.path.join(folder, bold)):
+            return folder, regular, bold
+    return None
+
+
+LIGATURES = re.compile("[\ufb00-\ufb06]")
+
+
+def ats_check(pdf, blocks):
+    """Read the PDF back the way a parser does and report what would break keyword matching."""
+    try:
+        import pymupdf as fitz
+    except ImportError:
+        import fitz
+    doc = fitz.open(pdf)
+    text = "".join(p.get_text() for p in doc)
+    problems = []
+    bad = sorted(set(re.findall(r"\S*[\ufb00-\ufb06]\S*", text)))
+    if bad:
+        problems.append(f"ligature glyphs break these words for parsers: {', '.join(bad[:8])}")
+    flat = re.sub(r"\s+", " ", text)
+    for kind, t in blocks:  # every heading and role line must come back as typed
+        if kind in ("h1", "h2", "h3"):
+            plain = re.sub(r"\s+", " ", re.sub(r"\*\*", "", t)).strip()
+            if plain.upper() not in flat.upper():
+                problems.append(f"not found as text: {plain!r}")
+    for p in problems:
+        print(f"ATS CHECK: {p}", file=sys.stderr)
+    if not problems:
+        print(f"ATS check: {pdf} reads back cleanly ({len(doc)} page{'s' if len(doc) > 1 else ''})")
+    return not problems
 
 
 def main():
@@ -207,6 +279,8 @@ def main():
         print(stem + ".docx")
     if not a.no_pdf and to_pdf(blocks, stem + ".pdf"):
         print(stem + ".pdf")
+        if not ats_check(stem + ".pdf", blocks):
+            sys.exit(1)
 
 
 if __name__ == "__main__":

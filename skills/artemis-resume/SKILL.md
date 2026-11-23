@@ -79,7 +79,14 @@ Summary, the bullet order and the keyword emphasis.
    Chat: create the DOCX (and PDF if available) with the document tools: one column, standard
    headings, no tables, text boxes, icons or photos, and contact details in the body, not a header.
    If file creation isn't available, give clean markdown they can paste into a document.
+   The renderer reads the PDF back like a parser and prints `ATS check: ... reads back cleanly`.
+   If it prints `ATS CHECK:` problems (ligature glyphs like "Staﬀ", missing headings), don't hand
+   the PDF over: hand over the DOCX, or have them export the PDF from Word.
 6. **Check before handing over** (one line per check):
+   - [ ] the renderer's ATS check passed
+   - [ ] one employer per `###` entry (two companies on one line become one garbled employer)
+   - [ ] section headings are the standard ones parsers expect: Summary, Experience, Projects,
+     Skills, Education (put extras like a GitHub link in the line under the heading, not in it)
    - [ ] 1 page for under 10 years of relevant history, otherwise 2 pages at most
    - [ ] every must-have keyword they truly have appears at least once, spelled as in the JD
    - [ ] every number traces to the fact bank
