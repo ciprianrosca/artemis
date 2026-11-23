@@ -8,15 +8,22 @@
   python tools/boards_jobs.py remoteok      # Remote OK public API (latest ~100 roles)
   python tools/boards_jobs.py workingnomads # Working Nomads public API
   python tools/boards_jobs.py remocate      # remocate.app RSS: remote and relocation roles
+  python tools/boards_jobs.py freehire      # freehire.me API: roles read straight from company ATSs
+  python tools/boards_jobs.py workable      # Workable Jobs: every company hiring through Workable
   python tools/boards_jobs.py all
 
 Every source goes through the same title and location rules as tools/ats_jobs.py, taken from
-profile/knowledge.json → filters. Search phrases for Himalayas and Getro come from
+profile/knowledge.json → filters. Search phrases for Himalayas, Getro, freehire and Workable come from
 knowledge.json → search.board_queries (default: your first four target titles). Remote roles tied to
 places outside your remote rule are dropped unless --include-restricted. Output is JSON on stdout.
 
 Remote OK's API terms ask anyone using it to link back to the job on Remote OK and name Remote OK
 as the source: keep the remoteok.com `url` and `source` when you show these roles.
+
+freehire keeps only postings it read from an ATS or a company's own site (not other boards or
+LinkedIn) and first saw in the last 14 days. Extra freehire filters can go in
+knowledge.json → search.freehire_params, e.g. {"regions": ["eu", "global"]}: see
+https://freehire.me/docs/api for the names and values.
 """
 import argparse
 import html
@@ -245,8 +252,80 @@ def remocate():
     return out, "remocate.app RSS"
 
 
+# --- freehire.me ------------------------------------------------------------------------------
+
+FREEHIRE_UA = "job-search-script/1.0"  # freehire asks bots to identify; a generic name is enough
+
+
+def freehire():
+    extra = (K.get("search") or {}).get("freehire_params") or {}
+    out, seen, ignored = [], set(), set()
+    for q in queries():
+        params = {"q": q, "q_fields": "title", "limit": 100, "open_within_days": 14,
+                  "source_type": ["ats", "company"], **extra}
+        d = json.loads(http("https://freehire.me/api/v1/jobs/search?" + urllib.parse.urlencode(params, doseq=True),
+                            headers={"User-Agent": FREEHIRE_UA}))
+        ignored |= set((d.get("meta") or {}).get("ignored_params") or [])
+        for j in d.get("data", []):
+            key = j.get("public_slug") or j.get("url")
+            if key in seen or not is_target(j.get("title")):
+                continue
+            seen.add(key)
+            mode = j.get("work_mode") or ""
+            where = j.get("location") or ""
+            codes = ", ".join(c.upper() for c in j.get("countries") or [])
+            if codes and codes.lower() not in where.lower():
+                where = f"{where} ({codes})" if where else codes
+            keep, restricted = location_ok(where or "Unspecified", mode == "remote")
+            if not keep:
+                continue
+            out.append({"source": f'freehire:{j.get("source")}', "company": j.get("company"), "title": j.get("title"),
+                        "location": where, "work_mode": mode, "remote_restricted": restricted,
+                        "url": (j.get("url") or "").replace("?utm_source=freehire.me", ""),
+                        "freehire_url": f'https://freehire.me/jobs/{j["public_slug"]}' if j.get("public_slug") else None,
+                        "posted": (j.get("posted_at") or j.get("created_at") or "")[:10],
+                        "skills": j.get("skills"), "reality": (j.get("reality") or {}).get("class"),
+                        "description": ((j.get("enrichment") or {}).get("summary") or text(j.get("description")))[:400]})
+        time.sleep(0.5)
+    note = "freehire.me (ATS and company sources, last 14 days): " + ", ".join(queries())
+    return out, note + (f"; ignored params: {sorted(ignored)}" if ignored else "")
+
+
+# --- Workable Jobs ----------------------------------------------------------------------------
+
+def workable():
+    # jobs.workable.com searches every company that hires through Workable; 20 roles per page.
+    out, seen = [], set()
+    for q in queries():
+        token = None
+        for _ in range(3):
+            url = "https://jobs.workable.com/api/v1/jobs?" + urllib.parse.urlencode(
+                {"query": q, **({"pageToken": token} if token else {})})
+            d = json.loads(http(url))
+            for j in d.get("jobs", []):
+                if j["id"] in seen or not is_target(j.get("title")):
+                    continue
+                seen.add(j["id"])
+                mode = (j.get("workplace") or "").replace("_", "-")
+                where = "; ".join(x for x in j.get("locations") or [] if x != "TELECOMMUTE") or "Remote"
+                keep, restricted = location_ok(where, mode == "remote")
+                if not keep:
+                    continue
+                out.append({"source": "workable", "company": (j.get("company") or {}).get("title"),
+                            "title": j.get("title"), "location": where, "work_mode": mode,
+                            "remote_restricted": restricted, "url": j.get("url"),
+                            "posted": (j.get("created") or "")[:10],
+                            "description": html.unescape(j.get("socialSharingDescription") or "")[:400]})
+            token = d.get("nextPageToken")
+            if not token:
+                break
+            time.sleep(0.5)
+    return out, "Workable Jobs: " + ", ".join(queries())
+
+
 SOURCES = {"hn": hn, "himalayas": himalayas, "getro": getro, "wwr": wwr,
-           "remoteok": remoteok, "workingnomads": workingnomads, "remocate": remocate}
+           "remoteok": remoteok, "workingnomads": workingnomads, "remocate": remocate,
+           "freehire": freehire, "workable": workable}
 
 
 def dedupe(jobs):

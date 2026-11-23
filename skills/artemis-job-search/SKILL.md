@@ -18,8 +18,10 @@ CLI paths: `profile/` and `applications/`. Chat: the Project's knowledge files.
    **CLI (Claude Code, Codex):** independent commands, in parallel where the agent allows it:
    - Careers boards on the watchlist: `python tools/ats_jobs.py scan`
    - Other boards: `python tools/boards_jobs.py all` (HN "Who is hiring?", Himalayas, VC
-     portfolio boards, We Work Remotely, Remote OK, Working Nomads, remocate.app). Remote OK's API
-     terms: when you show its roles, name Remote OK as the source and keep its link.
+     portfolio boards, We Work Remotely, Remote OK, Working Nomads, remocate.app, freehire.me,
+     Workable Jobs). freehire and Workable read company hiring systems directly, so new roles show
+     up there first. Remote OK's API terms: when you show its roles, name Remote OK as the source
+     and keep its link.
    - LinkedIn, once per title variant:
      `python tools/linkedin_jobs.py search "<title>" --location "<place>" --days 7`.
      Run one pass per entry in `search.linkedin_locations`; add `--remote` for the region pass.
@@ -27,6 +29,8 @@ CLI paths: `profile/` and `applications/`. Chat: the Project's knowledge files.
    - The manual watchlist (`watchlist_manual`): companies whose careers sites the tools can't
      read. Rotate through 3–4 per run with web search or web fetch.
    - `search.web_queries`: 2–4 per run with web search; open promising hits with web fetch.
+   - Sites the tools can't read: hiring.cafe blocks scripts and JobHunter (jobhunter.my) needs
+     an account. Suggest the user checks them in their own browser now and then; don't scrape them.
 
    **Chat (Claude app), or when a tool fails:** use web search for the same ground:
    - `site:boards.greenhouse.io OR site:jobs.lever.co OR site:jobs.ashbyhq.com "<title>" <location>`
@@ -69,7 +73,7 @@ CLI paths: `profile/` and `applications/`. Chat: the Project's knowledge files.
 | Location & mode | 15 | fully inside their location rule. `remote-restricted` with no confirmed route = 5 until checked |
 | Domain | 10 | in `industries_preferred`, or they have no preference. 0 and flag it if in `industries_avoid` |
 | Comp signal | 10 | posted range or credible market data ≥ their floor. Unknown = 5 |
-| Company health | 5 | growing, funded or profitable; no layoffs in the last 6 months |
+| Company health | 5 | growing, funded or profitable; no layoffs in the last 6 months (TrueUp's public layoffs and hiring-trend pages are a quick check) |
 | Upside | 10 | matches their `upside_signals` |
 
 Verdicts: **≥75 apply** · **60–74 stretch** (apply if the gap has an honest framing) · **<60 skip**
