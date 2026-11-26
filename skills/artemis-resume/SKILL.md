@@ -80,9 +80,12 @@ Summary, the bullet order and the keyword emphasis.
    their top needs; a close with availability. Don't restate the resume.
 5. **Render.**
    CLI: `python tools/render_resume.py applications/<folder>/resume.md --name <First>_<Last>_CV`
-   (and `cover.md --name <First>_<Last>_Cover_Letter`). This gives `.docx` and `.pdf`. Upload the
-   DOCX to ATS forms (they parse Word better) and send the PDF to humans. If PyMuPDF is missing, the
-   DOCX still renders; export the PDF from Word or Google Docs.
+   (and `cover.md --name <First>_<Last>_Cover_Letter`). This gives `.docx` and `.pdf`. Use the PDF by
+   default, for ATS forms and humans alike: once the renderer's ATS check passes, the PDF parses as cleanly
+   as Word and looks the same on every screen, and the hiring manager usually opens the file the ATS stored.
+   After uploading, check the fields the ATS autofilled from the CV. If they come out garbled, upload the
+   DOCX instead; use the DOCX too when a form asks for Word, or when the ATS check flagged the PDF. If
+   PyMuPDF is missing, the DOCX still renders; export the PDF from Word or Google Docs.
    Chat: create the DOCX (and PDF if available) with the document tools: one column, standard
    headings, no tables, text boxes, icons or photos, and contact details in the body, not a header.
    If file creation isn't available, give clean markdown they can paste into a document.
