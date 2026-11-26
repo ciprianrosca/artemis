@@ -47,7 +47,7 @@ Summary, the bullet order and the keyword emphasis.
    {{contact}}
 
    ## Summary
-   3–4 lines: level + years + domain match + 2 proof points + what I bring to *this* role.
+   3–4 lines: level + years + domain match + 2 proof points + what I'm strongest at.
 
    ## Experience
    ### <Title> — <Company> | <City (mode)> | <Mon YYYY> – Present
@@ -69,6 +69,10 @@ Summary, the bullet order and the keyword emphasis.
    **Bullet formula:** strong verb + what + scale + outcome, with the number in the first half.
    "Cut p99 latency from 480 ms to 120 ms on the payment API", not "Responsible for performance".
    One or two lines per bullet.
+   **A CV is a standalone document about the candidate.** Tailor through choice, order and the ad's
+   vocabulary, never by addressing the employer: no "this role", "your team", "the ground this role
+   covers", "what you need", the company's name or its product. A CV that talks to one employer reads
+   as mass-generated. Talking to the employer belongs in the cover letter and the form answers.
    `{{contact}}` is filled from `contact.json` at render time. In chat, write the contact line in
    directly from `contact.json`.
 4. **Write `cover.md`** if the application takes one or it's a direct email: ≤250 words and 3
@@ -76,9 +80,12 @@ Summary, the bullet order and the keyword emphasis.
    their top needs; a close with availability. Don't restate the resume.
 5. **Render.**
    CLI: `python tools/render_resume.py applications/<folder>/resume.md --name <First>_<Last>_CV`
-   (and `cover.md --name <First>_<Last>_Cover_Letter`). This gives `.docx` and `.pdf`. Upload the
-   DOCX to ATS forms (they parse Word better) and send the PDF to humans. If PyMuPDF is missing, the
-   DOCX still renders; export the PDF from Word or Google Docs.
+   (and `cover.md --name <First>_<Last>_Cover_Letter`). This gives `.docx` and `.pdf`. Use the PDF by
+   default, for ATS forms and humans alike: once the renderer's ATS check passes, the PDF parses as cleanly
+   as Word and looks the same on every screen, and the hiring manager usually opens the file the ATS stored.
+   After uploading, check the fields the ATS autofilled from the CV. If they come out garbled, upload the
+   DOCX instead; use the DOCX too when a form asks for Word, or when the ATS check flagged the PDF. If
+   PyMuPDF is missing, the DOCX still renders; export the PDF from Word or Google Docs.
    Chat: create the DOCX (and PDF if available) with the document tools: one column, standard
    headings, no tables, text boxes, icons or photos, and contact details in the body, not a header.
    If file creation isn't available, give clean markdown they can paste into a document.
@@ -94,6 +101,8 @@ Summary, the bullet order and the keyword emphasis.
    - [ ] every must-have keyword they truly have appears at least once, spelled as in the JD
    - [ ] every number traces to the fact bank
    - [ ] no `[GAP]`, `[VERIFY]`, `[CONF]`, `{{` or `**` left in the output
+   - [ ] the CV never addresses the employer ("this role", "your team", their name): it would read
+     the same if someone else picked it up
    - [ ] voice is consistent (no stray third person)
    - [ ] no non-public customer names, internal codenames or incident details
    - [ ] reverse-chronological; dates as `Mon YYYY`; tense consistent
